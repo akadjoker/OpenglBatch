@@ -74,7 +74,7 @@ struct Font
                     data.height >> delimiter >> data.xoffset >> delimiter >> data.yoffset  )
                     {
                     
-                        if (delimiter != ',' || ss.fail() || data.width <= 1 || data.height <= 1) 
+                        if (delimiter != ',' || ss.fail()) 
                         {
                             Log(1, "Formato incorreto na linha: %s",line.c_str());
                             return false;
@@ -90,6 +90,7 @@ struct Font
 
                     m_letters.push_back(data);
                     m_sizes.push_back(data.width);
+                    m_offsets.push_back(Vec2(data.xoffset,data.yoffset));
                     }
 
                 
@@ -131,6 +132,7 @@ struct Font
                 fx +=  m_proportion * scale  ;
                 Rectangle clip;
                 
+                Vec2 offset = m_offsets[i];
                 clip.x = m_letters[i].x;
                 clip.y = m_letters[i].y;
                 clip.width = m_letters[i].width;
@@ -143,7 +145,7 @@ struct Font
                
                 
                 total += (clip.width ) * scale * m_proportion;       
-                DrawTexture(&m_texture, fx, fy, scale, clip, color);
+                DrawTexture(&m_texture, fx, fy + offset.y, scale, clip, color);
                 fx += (clip.width ) * scale * m_proportion +  m_letters[i].xoffset;
             
             }
@@ -199,6 +201,7 @@ struct Font
             };
         std::vector<Character> m_letters;
         std::vector<Uint16> m_sizes;
+        std::vector<Vec2> m_offsets;
         Uint16 m_height;
         Uint16 m_length;
         Texture m_texture;

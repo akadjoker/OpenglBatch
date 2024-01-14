@@ -44,7 +44,8 @@ bool Texture::Load(const std::string &filePath)
     file.ReadUint8();//skip
 
     Uint8 imageType = file.ReadUint8();
-    if (imageType != 2)
+    
+    if (imageType != 2 && imageType != 10)
     {
         Log(2,"Error reading TGA data, unsupported ");
         createDefault();
@@ -67,14 +68,51 @@ bool Texture::Load(const std::string &filePath)
     }
 
     file.Seek(idLength +1, true);
-    channels = (pixelDepth / 8);
+    channels = (pixelDepth / 8); // bytes per pixel
 
     Log(1,"Image  (%d %d)   %d  %d",width,height,pixelDepth,channels);
 
 
-    Uint32 imageSize = width * height * (pixelDepth / 8);
+    Uint32 imageSize = width * height * channels;
+    if (imageType==2)
+    {
     dst = new Uint8[imageSize];
     file.Read(dst, imageSize);
+    } else 
+    if (imageType==10)
+    {
+        Log(1,"RLE");
+        dst = new Uint8[imageSize];
+        int currentByte = 0;
+        while (currentByte < imageSize)
+        {
+            Uint8 chunkHeader = file.ReadUint8();
+            if (chunkHeader < 128)
+            {
+                chunkHeader++;
+                file.Read(&dst[currentByte], channels * chunkHeader);
+                currentByte += channels * chunkHeader;
+                
+            }
+            else
+            {
+                chunkHeader -= 127;
+                int dataOffset = currentByte;
+                file.Read(&dst[dataOffset], channels);
+                currentByte += channels;
+                for(int count=1;count < chunkHeader;count++)
+                {
+                    for(int i=0;i<channels;i++)
+                    {
+                        dst[currentByte + i] = dst[dataOffset + i];
+                    }
+                    currentByte += channels;
+                }
+                
+            }
+        }
+
+    }
 
 
 

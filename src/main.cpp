@@ -813,7 +813,7 @@ int main()
     defaultTexture.createDefault();
 
     Font font;
-    font.Load("resources/font1.fnt");
+    font.Load("resources/font5.fnt");
 
     Batch batch;
     Primitives primitives;
@@ -1032,12 +1032,14 @@ int main()
 
         primitives.Circle(180, 100, 50, Color(255, 0, 0), true);
 
-
+ 
 
         primitives.Render();
 
 
-        font.DrawText("AKA djoker", 20, 300,1, Color(255,255,255));  
+        font.DrawText("AKA LUIS", 20, 300,2, Color(255,255,255));  
+        font.DrawText("1234567890", 20, 340,2, Color(255,255,255));  
+
         font.DrawText(10,10,1, Color(255,255,255), "%d", bunnies.size());
  
          
